@@ -1,0 +1,3 @@
+dependencies = [
+    "jax-fdm==0.14.0",
+]
