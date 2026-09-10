@@ -1,0 +1,77 @@
+---
+description: Python style, naming, and typing conventions
+globs: "**/*.py,**/*.ipynb"
+alwaysApply: false
+---
+
+# Python Conventions
+
+## Scope
+
+- Build the smallest implementation that is correct and complete for the request.
+- Add a container, class, or abstraction only when its absence is what makes the code hard to read or extend.
+- Plain mechanisms over clever ones: an `isinstance` branch beats a registry, a direct function beats a decorator stack.
+
+
+## Loops over comprehensions
+
+- Avoid list comprehensions. Build the result with an explicit `for` loop.
+- The same applies to dict, set, and generator comprehensions.
+- An explicit loop is easier to read line by line, and easier to step through in a debugger.
+
+```python
+# no
+lengths = [norm(vector) for vector in vectors]
+
+# yes
+lengths = []
+for vector in vectors:
+    lengths.append(norm(vector))
+```
+
+## Naming
+
+- Two-word names, for functions and container types. A single word cannot say what a thing is.
+- `snake_case` for functions, `PascalCase` for types. Make the qualifier carry information.
+- Name things by what they do, never by where they run. No `host`, `device`, `cpu`, or `gpu` in a function name.
+- Spell out a name whose domain has a homonym: a load case is `load_case`, never `case`.
+- Two containers playing the same role in parallel modules take the same name.
+- American English everywhere — identifiers, docstrings, comments, filenames: `analyze`, `behavior`, `center`, `optimize`, `modeled`.
+
+## One construction per statement
+
+- Never build a value inside a call's argument list or inside a `return`.
+- Assemble it, bind it to a name that says what it is, then pass or return that name.
+- Keep each construction to one line where it fits.
+
+```python
+# no
+report.write_table(
+    (ColumnSpec("d [mm]", ".1f"), ColumnSpec("gap", ".2e")),
+    rows_from(measured),
+)
+
+# yes
+columns = (ColumnSpec("d [mm]", ".1f"), ColumnSpec("gap", ".2e"))
+rows = rows_from(measured)
+report.write_table(columns, rows)
+```
+
+## Signatures
+
+- At most five arguments, counting `self`, positional and keyword alike.
+- A sixth argument is a container that never arrived: group the related ones into a `NamedTuple` or dataclass and pass that.
+- A function that returns more than two values returns a named container, never a long tuple the caller unpacks by position.
+- Long signatures take one argument per line.
+
+## Imports
+
+- Top-of-file only. Never inside a function, even for heavy or optional dependencies, and never to break a cycle.
+- One name per `from X import` line. No `a, b`, no parenthesized groups.
+- Never let a formatter collapse imports.
+
+## Docstrings and comments
+
+- Describe meaning, not type.
+- Keep notes short and general. State the mechanism and its consequence, not a specific benchmark, path, or measured number.
+- Comments are at most one line, no periods.

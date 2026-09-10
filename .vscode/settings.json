@@ -1,0 +1,28 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.terminal.executeInFileDir": true,
+
+  "cursorpyright.analysis.autoImportCompletions": true,
+
+  "jupyter.notebookFileRoot": "${fileDirname}",
+
+  "editor.formatOnSave": false,
+  "editor.inlayHints.enabled": "off",
+  "editor.minimap.enabled": false,
+  "editor.wordWrap": "on",
+  "workbench.editor.enablePreview": false,
+  "files.autoSave": "onFocusChange",
+
+  "files.exclude": {
+    "**/.venv": true,
+    "**/__pycache__": true
+  },
+  "files.watcherExclude": {
+    "**/.venv/**": true,
+    "**/__pycache__/**": true
+  },
+  "search.exclude": {
+    "**/.venv": true,
+    "**/__pycache__": true
+  }
+}

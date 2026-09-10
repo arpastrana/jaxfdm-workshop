@@ -1,0 +1,33 @@
+---
+description: JAX numerical programming conventions
+globs: "**/*.py,**/*.ipynb"
+alwaysApply: false
+---
+
+# JAX Conventions
+
+- Import JAX NumPy as `jnp`.
+- Do not use NumPy operations inside JAX-transformed functions.
+- Treat array shape as part of the mathematical API.
+- Prefer creating arrays with their intended broadcast shape.
+- Avoid `None` indexing and unnecessary `reshape`.
+- Prefer `jnp.linalg.solve(A, b)` over explicit matrix inverses.
+- Do not materialize large Jacobians unless explicitly required.
+- Use `jax.grad` for scalar-valued objectives and an explicit Jacobian only when the algorithm requires one.
+
+## Array construction
+
+- Never assemble, convert, and return in one expression.
+- Separate the three steps: named coefficients, a plain list of lists, then `jnp.asarray` on its own line.
+
+```python
+k_shear = ...
+k_bend = ...
+
+block = [[k_shear, 0.0],
+         [0.0, k_bend]]
+
+stiffness = jnp.asarray(block)
+
+return stiffness
+```

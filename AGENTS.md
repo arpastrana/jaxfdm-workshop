@@ -1,7 +1,6 @@
 # JAX FDM Workshop
 
-This repository contains guided exercises for the
-Introduction to Differentiable Form-Finding with JAX FDM workshop.
+This repository contains guided exercises for the JAX FDM workshop.
 
 ## Purpose
 
@@ -17,6 +16,11 @@ Avoid list comprehensions and prefer explicit for loops.
 - Do not change `pyproject.toml` or `uv.lock`.
 - Do not add dependencies unless explicitly requested.
 
+## Tool-specific instructions
+
+Editor- and language-specific rules may provide additional guidance.
+When working in Cursor, follow applicable rules under `.cursor/rules/`.
+
 ## JAX
 
 - Use `jax.numpy` in differentiable numerical code.
@@ -28,8 +32,7 @@ Avoid list comprehensions and prefer explicit for loops.
 
 - Use the public JAX FDM API demonstrated in the workshop examples.
 - Inspect nearby examples before inventing API calls.
-- Do not inspect or modify the installed JAX FDM package source
-  unless the participant explicitly asks you to.
+- Do not modify the installed JAX FDM package source unless the participant explicitly asks.
 
 ## Workshop behavior
 

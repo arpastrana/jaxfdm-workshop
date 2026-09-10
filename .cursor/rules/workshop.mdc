@@ -1,0 +1,13 @@
+---
+description: Cursor-specific behavior for workshop exercises
+globs: "**/*.py,**/*.ipynb"
+alwaysApply: false
+---
+
+# Workshop Editing
+
+- Use Cursor's native editing tools so changes remain visible in the diff/review UI.
+- Prefer one small, reviewable edit at a time.
+- Preserve comments that explain mechanics or numerical concepts.
+- Do not replace an educational implementation with a more sophisticated abstraction.
+- When modifying structural parameters, briefly explain the expected mechanical effect.

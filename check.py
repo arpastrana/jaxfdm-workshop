@@ -3,7 +3,7 @@ JAX FDM Workshop — Environment Check
 
 Run with:
 
-    uv run python workshop_check.py
+    uv run python check.py
 """
 
 from __future__ import annotations
@@ -11,6 +11,11 @@ from __future__ import annotations
 import importlib
 import platform
 import struct
+import sys
+import tomllib
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).parent
 
 
 # ---------------------------------------------------------------------------
@@ -24,6 +29,7 @@ SKIP = "○"
 ARROW = "→"
 
 results: list[tuple[str, str, str]] = []
+versions: dict[str, str] = {}
 
 
 def heading(text: str) -> None:
@@ -115,9 +121,9 @@ if system == "Windows":
     elif is_arm64:
         warned(
             "Windows ARM64",
-            "native JAX support may be unavailable",
+            "JAX publishes no Windows ARM64 wheels",
         )
-        print(f"     {ARROW} Cloud/Codespaces fallback is recommended if JAX fails.")
+        print(f"     {ARROW} Please contact the workshop instructor.")
 
     else:
         warned(
@@ -128,8 +134,19 @@ if system == "Windows":
 elif system == "Darwin":
     if is_arm64:
         passed("Apple Silicon", "compatible with JAX")
+
+    elif is_x64:
+        warned(
+            "Intel Mac",
+            "JAX no longer publishes macOS x86_64 wheels",
+        )
+        print(f"     {ARROW} Please contact the workshop instructor.")
+
     else:
-        passed("macOS", machine)
+        warned(
+            "macOS architecture",
+            f"unrecognized architecture: {machine}",
+        )
 
 elif system == "Linux":
     passed("Linux", machine)
@@ -151,6 +168,7 @@ def package_available(module_name: str, display_name: str) -> bool:
         version = getattr(module, "__version__", None)
 
         if version:
+            versions[display_name] = version
             passed(display_name, f"version {version}")
         else:
             passed(display_name)
@@ -173,6 +191,87 @@ matplotlib_available = package_available("matplotlib", "Matplotlib")
 # Add/remove these depending on the final workshop environment.
 compas_available = package_available("compas", "COMPAS")
 jax_fdm_available = package_available("jax_fdm", "JAX FDM")
+
+
+# ---------------------------------------------------------------------------
+# Pinned versions
+# ---------------------------------------------------------------------------
+
+heading("Versions")
+
+
+def version_series(version: str) -> str:
+    """
+    Return the major.minor part of a version string.
+    """
+    parts = version.split(".")
+
+    return ".".join(parts[:2])
+
+
+def python_pinned() -> str | None:
+    """
+    Return the Python version pinned in .python-version, if any.
+    """
+    version_file = ROOT_DIR / ".python-version"
+
+    if not version_file.exists():
+        return None
+
+    return version_file.read_text().strip()
+
+
+def jaxfdm_pinned() -> str | None:
+    """
+    Return the JAX FDM version pinned in pyproject.toml, if any.
+    """
+    project_file = ROOT_DIR / "pyproject.toml"
+
+    if not project_file.exists():
+        return None
+
+    config = tomllib.loads(project_file.read_text())
+    project = config.get("project", {})
+
+    for dependency in project.get("dependencies", []):
+        if dependency.startswith("jax-fdm") and "==" in dependency:
+            return dependency.split("==")[1].strip()
+
+    return None
+
+
+python_expected = python_pinned()
+
+if python_expected is None:
+    skipped("Pinned Python", ".python-version not found")
+
+elif version_series(python_version) == version_series(python_expected):
+    passed("Pinned Python", f"{python_version} matches {python_expected}")
+
+else:
+    failed(
+        "Pinned Python",
+        f"expected {python_expected}, found {python_version}",
+    )
+
+
+jaxfdm_expected = jaxfdm_pinned()
+jaxfdm_found = versions.get("JAX FDM")
+
+if jaxfdm_found is None:
+    skipped("Pinned JAX FDM", "JAX FDM is unavailable")
+
+elif jaxfdm_expected is None:
+    skipped("Pinned JAX FDM", "no pin found in pyproject.toml")
+
+elif jaxfdm_found == jaxfdm_expected:
+    passed("Pinned JAX FDM", f"{jaxfdm_found} matches the pin")
+
+else:
+    failed(
+        "Pinned JAX FDM",
+        f"expected {jaxfdm_expected}, found {jaxfdm_found}",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -344,7 +443,7 @@ if not failures:
     print(f"  {CHECK}  Everything looks good!")
     print()
     print("     Your computer is ready for the JAX FDM workshop.")
-    print("     Cursor + uv + JAX can run locally.")
+    print("     uv, JAX and JAX FDM all run locally.")
 
     if warnings:
         print()
@@ -374,13 +473,18 @@ else:
 
     if system == "Windows" and is_arm64:
         print()
-        print(f"     {ARROW} Windows ARM64 detected.")
-        print(f"     {ARROW} Please use the workshop cloud/Codespaces fallback.")
+        print(f"     {ARROW} JAX publishes no Windows ARM64 wheels.")
+        print(f"     {ARROW} Please contact the workshop instructor.")
+
+    elif system == "Darwin" and is_x64:
+        print()
+        print(f"     {ARROW} JAX publishes no macOS x86_64 wheels.")
+        print(f"     {ARROW} Please contact the workshop instructor.")
 
     else:
         print()
         print(f"     {ARROW} First try: uv sync")
-        print(f"     {ARROW} Then rerun: uv run python workshop_check.py")
+        print(f"     {ARROW} Then rerun: uv run python check.py")
 
     print()
     print(
@@ -389,3 +493,6 @@ else:
     )
 
 print()
+
+if failures:
+    sys.exit(1)
