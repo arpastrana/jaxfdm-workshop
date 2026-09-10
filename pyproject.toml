@@ -1,3 +1,20 @@
 dependencies = [
     "jax-fdm==0.14.0",
 ]
+
+[project]
+name = "jax-fdm-workshop"
+version = "0.1.0"
+description = "Workshop materials for differentiable form-finding with JAX FDM"
+requires-python = ">=3.12,<3.14"
+
+dependencies = [
+    "jax[cpu]>=0.6.1",
+    "jax-fdm[viz]",
+    "matplotlib",
+    "jupyterlab",
+    "ipykernel"
+]
+
+[tool.uv]
+package = false

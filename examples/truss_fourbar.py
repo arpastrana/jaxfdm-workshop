@@ -4,11 +4,11 @@ from math import fabs
 # compas
 from compas.colors import Color
 from compas.datastructures import Mesh
-from compas.datastructures import network_find_cycles
+# from compas.datastructures import network_find_cycles
 from compas.geometry import length_vector
 from compas.geometry import Line
 from compas.geometry import Polyline
-from compas.utilities import pairwise
+# from compas.utilities import pairwise
 
 # static equilibrium
 from jax_fdm.datastructures import FDNetwork
@@ -46,7 +46,7 @@ supports = (1, 2, 3, 4)
 view = True
 
 # plotting
-plot = False
+plot = True
 plot_save = False
 plot_extension = "pdf"
 
@@ -73,8 +73,8 @@ for key in supports:
 
 # add edges
 for (u, v), force in edges.items():
-    network.add_edge(u, v)
-    length = network.edge_length(u, v)
+    edge = network.add_edge(u, v)
+    length = network.edge_length(edge)
     q = force / length
     print((u, v), f"q:{round(q, 2)}\tlength: {round(length, 2)}")
     network.edge_forcedensity((u, v), q)
@@ -123,32 +123,32 @@ for edge in network.edges():
     force = eq_network.edge_force(edge)
     print(f"\tEdge {edge} force:{round(force, 2)}")
 
-print("\nForm found network with shape dependent loads")
+# print("\nForm found network with shape dependent loads")
 
 # network.node_load(0, [0.0, 0.0, 0.0])
 # apply edge loads
-pz_nodes_sum = pz_iter * network.number_of_nodes()
-pz_edge = pz_nodes_sum / network.number_of_edges()
-network.edges_loads([0.0, 0.0, pz_edge])
-py_edges_sum = pz_edge * network.number_of_edges()
+# pz_nodes_sum = pz_iter * network.number_of_nodes()
+# pz_edge = pz_nodes_sum / network.number_of_edges()
+# network.edges_loads([0.0, 0.0, pz_edge])
+# py_edges_sum = pz_edge * network.number_of_edges()
 
-assert py_edges_sum == pz_nodes_sum
+# assert py_edges_sum == pz_nodes_sum
 
-network.nodes_loads([0.0, 0.0, 0.0])
-eq_network_iter = fdm(network, tmax=100, is_load_local=False, verbose=False)
-eq_network_iter.print_stats()
+# network.nodes_loads([0.0, 0.0, 0.0])
+# eq_network_iter = fdm(network, tmax=100, is_load_local=False, verbose=False)
+# eq_network_iter.print_stats()
 
-key = 0
-px, py, pz = eq_network_iter.node_attributes(key, ["px", "py", "pz"])
-print(f"\tNode {key} px:{round(px, 2)}\tpy:{round(py, 2)}\tpz:{round(pz, 2)}")
+# key = 0
+# px, py, pz = eq_network_iter.node_attributes(key, ["px", "py", "pz"])
+# print(f"\tNode {key} px:{round(px, 2)}\tpy:{round(py, 2)}\tpz:{round(pz, 2)}")
 
-for key in network.nodes():
-    x, y, z = eq_network_iter.node_coordinates(key)
-    print(f"\tNode {key} x:{round(x, 6)}\ty:{round(y, 6)}\tz:{round(z, 6)}")
+# for key in network.nodes():
+#     x, y, z = eq_network_iter.node_coordinates(key)
+#     print(f"\tNode {key} x:{round(x, 6)}\ty:{round(y, 6)}\tz:{round(z, 6)}")
 
-for edge in network.edges():
-    force = eq_network_iter.edge_force(edge)
-    print(f"\tEdge {edge} force:{round(force, 2)}")
+# for edge in network.edges():
+#     force = eq_network_iter.edge_force(edge)
+#     print(f"\tEdge {edge} force:{round(force, 2)}")
 
 # ymax = max(eq_network.nodes_attribute("y"), key=lambda x: fabs(x))
 # print(f"{q_init=}, ymax={round(ymax, 4)}")
@@ -159,8 +159,8 @@ for edge in network.edges():
 
 if view:
 
-    viewer = Viewer(width=1000, height=1000, show_grid=False)
-    viewer.view.camera.distance = 4.0  # 2.5
+    viewer = Viewer(width=900, height=900, show_grid=False)
+    # viewer.view.camera.distance = 4.0  # 2.5
 
     # plot network with edge load in equilibrium
     viewer.add(eq_network,  # fixed_network, eq_network_iter
@@ -198,12 +198,12 @@ if view:
     viewer.add(Polyline(points))
 
     # add mesh
-    _network = eq_network.copy()
-    for a, b in pairwise([1, 4, 2, 3, 1]):
-        _network.add_edge(a, b)
-    faces = network_find_cycles(_network)[1:]
-    vertices = {vkey: _network.node_coordinates(vkey) for vkey in network.nodes()}
-    mesh = Mesh.from_vertices_and_faces(vertices, faces)
+    # _network = eq_network.copy()
+    # for a, b in pairwise([1, 4, 2, 3, 1]):
+    #     _network.add_edge(a, b)
+    # faces = network_find_cycles(_network)[1:]
+    # vertices = {vkey: _network.node_coordinates(vkey) for vkey in network.nodes()}
+    # mesh = Mesh.from_vertices_and_faces(vertices, faces)
 
     # viewer.add(mesh, opacity=0.4, show_points=False)
 
@@ -218,20 +218,20 @@ if plot:
     plotter = Plotter(dpi=150)
 
     # plot network with edge load in equilibrium
-    plotter.add(eq_network_iter,
-                show_nodes=True,
-                show_loads=True,
-                show_reactions=False,
-                nodesize=nodesize,
-                edgecolor="force",
-                edgewidth=edgewidth,
-                reactionscale=1.0,
-                sizepolicy=nodesizepolicy,
-                loadscale=0.5)
+    # plotter.add(eq_network_iter,
+    #             show_nodes=True,
+    #             show_loads=True,
+    #             show_reactions=False,
+    #             nodesize=nodesize,
+    #             edgecolor="force",
+    #             edgewidth=edgewidth,
+    #             reactionscale=1.0,
+    #             sizepolicy=nodesizepolicy,
+    #             loadscale=0.5)
 
     # plot network with static load in equilibrium
-    for u, v in network.edges():
-        edge_line = Line(*eq_network.edge_coordinates(u, v))
+    for edge in network.edges():
+        edge_line = Line(*eq_network.edge_coordinates(edge))
         plotter.add(edge_line,
                     draw_as_segment=True,
                     linestyle="dashed",  # linestyles: "solid", "dotted", "dashed", "dashdot"
@@ -260,16 +260,16 @@ if plot:
     #                 color=Color(0.9, 0.9, 0.9),
     #                 )
 
-    if draw_connecting_lines:
-        for node in network.nodes():
-            line = Line(eq_network.node_coordinates(node),
-                        eq_network_iter.node_coordinates(node))
-            plotter.add(line,
-                        draw_as_segment=True,
-                        linestyle="dashed",  # linestyles: "solid", "dotted", "dashed", "dashdot"
-                        linewidth=0.25,
-                        color=Color.black(),
-                        zorder=5000)
+    # if draw_connecting_lines:
+    #     for node in network.nodes():
+    #         line = Line(eq_network.node_coordinates(node),
+    #                     eq_network_iter.node_coordinates(node))
+    #         plotter.add(line,
+    #                     draw_as_segment=True,
+    #                     linestyle="dashed",  # linestyles: "solid", "dotted", "dashed", "dashdot"
+    #                     linewidth=0.25,
+    #                     color=Color.black(),
+    #                     zorder=5000)
 
     # save le crème
     plotter.zoom_extents()
