@@ -3,6 +3,8 @@
   "python.terminal.executeInFileDir": true,
 
   "cursorpyright.analysis.autoImportCompletions": true,
+  "cursorpyright.analysis.stubPath": "${workspaceFolder}/typings",
+  "cursorpyright.analysis.useLibraryCodeForTypes": true,
 
   "jupyter.notebookFileRoot": "${fileDirname}",
 
