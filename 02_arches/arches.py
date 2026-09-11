@@ -1,14 +1,19 @@
 """
 Form-find two arches that cross at the crown.
 
-Each arch has its own force density. Change them until the shared crown
-reaches the target rise.
+One force density controls every edge of both arches. Change it until the
+shared crown reaches the target rise.
 """
-from compas.geometry import Plane
+from math import radians
 
-from jax_fdm.datastructures import FDNetwork
+from compas.geometry import Plane
+from compas.geometry import Rotation
+
 from jax_fdm.equilibrium import fdm
 from jax_fdm.visualization import Viewer
+
+from helpers import create_arch_network
+from helpers import fuse_networks
 
 
 # ------------------------------------------------------------------------------
@@ -18,8 +23,7 @@ from jax_fdm.visualization import Viewer
 # Horizontal distance between opposite supports
 span = 10.0
 
-# Number of straight segments along each arch
-# Keep this even so the two arches share a node at the center
+# Number of straight segments along each arch, keep it even so they share a crown
 num_segments = 10
 
 # Downward load applied at every free node
@@ -30,44 +34,21 @@ target_rise = 3.0
 
 # TUNE THIS NUMBER
 # Negative force densities put the arches in compression, positive in tension
-q = -2.0
+q = -2.5
 
 # ------------------------------------------------------------------------------
-# First arch, along X
+# Two arches crossing at the crown
 # ------------------------------------------------------------------------------
 
-network = FDNetwork()
+arch_x = create_arch_network(span, num_segments)
 
-# Start flat, on a straight line between the supports
-for i in range(num_segments + 1):
-    x = -0.5 * span + span * i / num_segments
-    network.add_node(i, x=x, y=0.0, z=0.0)
+# The second arch is the first one turned a quarter turn about the vertical axis
+rotation = Rotation.from_axis_and_angle([0.0, 0.0, 1.0], radians(90.0))
+arch_y = arch_x.transformed(rotation)
 
-for i in range(num_segments):
-    edge = network.add_edge(i, i + 1)
-
-# ------------------------------------------------------------------------------
-# Second arch, along Y, sharing the crown
-# ------------------------------------------------------------------------------
-
-# The first arch's middle node is the crossing
-crown = num_segments // 2
-
-# Walk from y = -span/2 to y = +span/2. Reuse the crown at y = 0
-keys_y = []
-next_key = num_segments + 1
-
-for i in range(num_segments + 1):
-    y = -0.5 * span + span * i / num_segments
-    if i == crown:
-        keys_y.append(crown)
-    else:
-        network.add_node(next_key, x=0.0, y=y, z=0.0)
-        keys_y.append(next_key)
-        next_key = next_key + 1
-
-for i in range(num_segments):
-    edge = network.add_edge(keys_y[i], keys_y[i + 1])
+# Fusing welds the node the two arches have in common
+network, shared_nodes = fuse_networks(arch_x, arch_y)
+crown_node = shared_nodes.pop()
 
 # ------------------------------------------------------------------------------
 # Assign force densities
@@ -85,26 +66,24 @@ for node in network.nodes():
         network.node_support(node)
 
 # ------------------------------------------------------------------------------
-# Loads
+# Loads on the free nodes
 # ------------------------------------------------------------------------------
 
-# Free nodes of the first arch, including the crown
 for node in network.nodes_free():
     network.node_load(node, [0.0, 0.0, load_node])
 
 # ------------------------------------------------------------------------------
-# Solve for static equilibrium
+# Form-find the arch
 # ------------------------------------------------------------------------------
 
 eq_network = fdm(network)
 
 # ------------------------------------------------------------------------------
-# How close did we get?
+# How close did we get to the target?
 # ------------------------------------------------------------------------------
 
-x, y, z = eq_network.node_coordinates(crown)
+x, y, z = eq_network.node_coordinates(crown_node)
 error = z - target_rise
-
 print(f"q {q:+.3f}\tRise = {z:.3f}\tTarget = {target_rise:.3f}\tError = {error:+.3f}")
 
 # ------------------------------------------------------------------------------
