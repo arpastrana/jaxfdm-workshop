@@ -3,6 +3,10 @@ Four-bar form-finding problem in 3D comparing Newton's and the force density met
 
 One free node is connected to four supports. Edge forces are signed:
 negative values mean compression.
+
+Prescribed forces need several Newton updates, prescribed force densities need
+one. The two land on different shapes, because the force densities are taken
+from the initial geometry rather than from the equilibrium one.
 """
 
 import jax
@@ -124,6 +128,11 @@ def solve_formfinding(residual, x, num_steps):
         # Compute residual
         r = residual(x)
 
+        # Log progress, before the update, so the position and the residual match
+        residual_norm = compute_vector_norm(r)
+        residual_norms.append(residual_norm)
+        print(f"Step {step}: x = {x}, |r| = {residual_norm:.3e}")
+
         # Compute Jacobian (the geometric stiffness matrix!)
         K = jax.jacobian(residual)(x)
 
@@ -132,11 +141,6 @@ def solve_formfinding(residual, x, num_steps):
 
         # Update node positions
         x = x + dx
-
-        # Log progress
-        residual_norm = compute_vector_norm(r)
-        residual_norms.append(residual_norm)
-        print(f"Step {step}: x = {x}, |r| = {residual_norm:.3e}")
 
     return x, residual_norms
 

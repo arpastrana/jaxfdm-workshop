@@ -49,48 +49,6 @@ def _as_scalar(value):
     return float(value)
 
 
-def create_chain_network(supports, x, loads=None, forces=None, residuals=None):
-    """
-    Create a JAX FDM network from a chain of free nodes between two supports.
-    """
-    network = FDNetwork()
-
-    # The chain runs support, free nodes in order, support
-    points = [supports[0]]
-    for position in x:
-        points.append(position)
-    points.append(supports[1])
-
-    for key, point in enumerate(points):
-        px, py, pz = _as_xyz(point)
-        network.add_node(key, x=px, y=py, z=pz)
-
-    last = len(points) - 1
-    network.node_support(0)
-    network.node_support(last)
-
-    for key in range(1, last):
-        if loads is not None:
-            lx, ly, lz = _as_xyz(loads[key - 1])
-            network.node_load(key, [lx, ly, lz])
-
-        if residuals is not None:
-            # JAX FDM stores rx, ry, rz as load - internal, so negate it before drawing
-            rx, ry, rz = _as_xyz(residuals[key - 1])
-            network.node_attributes(key, ["rx", "ry", "rz"], [-rx, -ry, -rz])
-
-    for key in range(last):
-        edge = network.add_edge(key, key + 1)
-
-        if forces is not None:
-            force = _as_scalar(forces[key])
-            length = network.edge_length(edge)
-            network.edge_attribute(edge, "force", force)
-            network.edge_forcedensity(edge, force / length)
-
-    return network
-
-
 def create_network(supports, x, load=None, forces=None, residual=None):
     """
     Create a JAX FDM network from a free node.
