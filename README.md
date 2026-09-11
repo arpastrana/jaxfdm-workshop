@@ -203,7 +203,7 @@ environment on the path.
 
 ## Workshop outline
 
-1. **`00_jax` — a JAX crash course.** Arrays, `jit`, `grad`, and the functional style JAX expects.
+1. **`00_jax` — a JAX primer.** Arrays with meaningful shapes, vectorizing with `vmap`, and the two derivative transformations, `grad` and `jacobian`.
 2. **`01_form_finding` — equilibrium from scratch.** Derive the force density method, and see why prescribing force densities instead of forces turns a nonlinear problem into a linear one.
 3. **`02_arches` — the arches.** Form-finding a real structure, and differentiating through the linear equilibrium solve.
 4. **`03_gridshell` — constrained form-finding.** Goals, losses, and constraints on a gridshell with JAX FDM's optimization API.

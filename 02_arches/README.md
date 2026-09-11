@@ -62,7 +62,7 @@ q = -2.5
 4. Look at your table. Multiply each `q` by its rise. What do you notice?
 5. Using that pattern, **predict** the `q` for a 2 m rise before you run it.
    Then check.
-6. Make `q` positive. What happens, and why does the viewer now call it tension?
+6. Make `q` positive. What happens?
 
 **What is going on**
 

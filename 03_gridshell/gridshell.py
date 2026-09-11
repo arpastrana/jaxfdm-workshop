@@ -205,6 +205,7 @@ viewer.add(
     show_supports=False,
     show_loads=False,
     show_reactions=False,
+    loadscale=0.5,
 )
 
 # Form-found gridshell, each panel painted by how far it is from flat
@@ -216,6 +217,7 @@ viewer.add(
     show_vertices=True,
     show_loads=True,
     show_reactions=False,
+    loadscale=0.5,
 )
 
 viewer.show()
