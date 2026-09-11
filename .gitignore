@@ -11,3 +11,6 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
+
+# Internal working notes, not part of the workshop
+plan.md

@@ -16,10 +16,16 @@ Avoid list comprehensions and prefer explicit for loops.
 - Do not change `pyproject.toml` or `uv.lock`.
 - Do not add dependencies unless explicitly requested.
 
-## Tool-specific instructions
+## Coding rules
 
-Editor- and language-specific rules may provide additional guidance.
-When working in Cursor, follow applicable rules under `.cursor/rules/`.
+These files carry the language and editing rules for this repository. Read them
+before writing code, whatever editor or agent you are:
+
+- `.cursor/rules/python.mdc` — scope, loops over comprehensions, naming, imports, docstrings
+- `.cursor/rules/jax.mdc` — JAX numerical conventions and array construction
+- `.cursor/rules/workshop.mdc` — how to edit workshop exercises
+
+Cursor loads them on its own from `.cursor/rules/`. Other agents should open them.
 
 ## JAX
 

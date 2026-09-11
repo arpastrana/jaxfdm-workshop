@@ -18,7 +18,7 @@ far it is from flat.
 
 ## What the script says
 
-The target is `data/mesh_27.json`: 100 vertices, 81 quad faces, spanning about
+The target is `data/mesh_freeform.json`: 100 vertices, 81 quad faces, spanning about
 11 × 11 m and rising 5.5 m. The starting grid is generated flat, in the same
 vertex order, so vertex *i* pairs with vertex *i* on the target.
 
@@ -140,4 +140,4 @@ when it is a poor match to the target or a nuisance to clad.
 | --- | --- |
 | `gridshell.py` | The exercise |
 | `planarity.py` | Panel flatness, coloring and distance measures, not part of the lesson |
-| `../data/mesh_27.json` | Target surface, a 10 × 10 quad grid |
+| `../data/mesh_freeform.json` | Target surface, 100 vertices and 81 quads |

@@ -120,6 +120,6 @@ Everything after this folder is that one call, plus goals.
 | --- | --- |
 | `four_bars.py` | The residual, the Newton solver, and the comparison |
 | `four_bars_jaxfdm.py` | The same problem solved by `fdm()` |
+| `four_bars_model.py` | The same problem through the numerical core, with no network |
 | `helpers.py` | Vector norms and network building, not part of the lesson |
 | `visualization.py` | Convergence chart and 3D viewer, not part of the lesson |
-| `_archive/` | Earlier two-bar and three-bar versions, kept for reference |

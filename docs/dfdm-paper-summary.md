@@ -68,7 +68,7 @@ position* `x₁`. No initial guess, no divergence, no tuning — as long as
 
 Figure 2 shows the worked example: `x₁ = [0, 0, 0]ᵀ → x₁* = [0.15, 0, 0.58]ᵀ`,
 with a force polygon that is open at the start and closed at equilibrium
-(graphic statics). **These are exactly the numbers in `01_form_finding/fourbar.py`.**
+(graphic statics). **These are exactly the numbers in `01_form_finding/four_bars.py`.**
 
 ## Section 2.2 — Mechanical model (energy view)
 
