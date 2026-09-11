@@ -15,6 +15,9 @@ import sys
 import tomllib
 from pathlib import Path
 
+# Windows shenanigans
+sys.stdout.reconfigure(encoding="utf-8")
+
 ROOT_DIR = Path(__file__).parent
 
 
