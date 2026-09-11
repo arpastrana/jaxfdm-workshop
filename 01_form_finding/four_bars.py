@@ -8,9 +8,12 @@ negative values mean compression.
 import jax
 import jax.numpy as jnp
 
+from helpers import compute_vector_norm
+from helpers import compute_vectors_norm
 from visualization import plot_convergence
-from visualization import view_funicular_shape
+from visualization import view_structure
 from visualization import show_plots
+from visualization import show_viewer
 
 
 # ------------------------------------------------------------------------------
@@ -31,8 +34,7 @@ supports = [
 # Load vector (x, y, z)
 load = [0.0, 0.0, -1.0]
 
-# Edge internal forces (signed: negative is compression)
-# One value per edge, stored as a column so they multiply 3D edge vectors
+# Edge internal forces (one value per edge, signed: negative is compression)
 forces = [
     [-0.5],
     [-1.0],
@@ -50,40 +52,27 @@ supports = jnp.array(supports)
 load = jnp.array(load)
 forces = jnp.array(forces)
 
-
-# ------------------------------------------------------------------------------
-# Vector lengths
-# ------------------------------------------------------------------------------
-
-def compute_vector_lengths(vectors):
-
-    return jnp.linalg.norm(vectors, axis=1, keepdims=True)
-
-
 # ------------------------------------------------------------------------------
 # Force densities from the initial geometry: q = force / length
 # ------------------------------------------------------------------------------
 
-def compute_force_densities(x, supports, forces):
-
-    lengths = compute_vector_lengths(x - supports)
-    return forces / lengths
-
-
-q = compute_force_densities(x0, supports, forces)
-
+edge_vectors = x0 - supports
+lengths = compute_vectors_norm(edge_vectors)
+q = forces / lengths
 
 # ------------------------------------------------------------------------------
 # Nonlinear equilibrium: prescribed forces
 # ------------------------------------------------------------------------------
 
 def residual_forces(x):
-
+    """
+    Compute the residual at the free node using prescribed forces.
+    """
     # Extract edge vectors
     edge_vectors = x - supports
 
     # Find edge lengths
-    lengths = compute_vector_lengths(edge_vectors)
+    lengths = compute_vectors_norm(edge_vectors)
 
     # Compute force directions
     directions = edge_vectors / lengths
@@ -103,7 +92,9 @@ def residual_forces(x):
 # ------------------------------------------------------------------------------
 
 def residual_forcedensities(x):
-
+    """
+    Compute the residual at the free node using force densities.
+    """
     # Extract edge vectors
     edge_vectors = x - supports
 
@@ -122,7 +113,9 @@ def residual_forcedensities(x):
 # ------------------------------------------------------------------------------
 
 def solve_formfinding(residual, x, num_steps):
-
+    """
+    Solve the equilibrium problem with Newton's method.
+    """
     residual_norms = []
 
     # Iterate for a fixed number of steps
@@ -130,11 +123,6 @@ def solve_formfinding(residual, x, num_steps):
 
         # Compute residual
         r = residual(x)
-
-        # Log progress
-        residual_norm = jnp.linalg.norm(r)
-        residual_norms.append(residual_norm)
-        print(f"Step {step}: x = {x}, |r| = {residual_norm:.3e}")
 
         # Compute Jacobian (the geometric stiffness matrix!)
         K = jax.jacobian(residual)(x)
@@ -144,6 +132,11 @@ def solve_formfinding(residual, x, num_steps):
 
         # Update node positions
         x = x + dx
+
+        # Log progress
+        residual_norm = compute_vector_norm(r)
+        residual_norms.append(residual_norm)
+        print(f"Step {step}: x = {x}, |r| = {residual_norm:.3e}")
 
     return x, residual_norms
 
@@ -158,7 +151,9 @@ x_force, residuals_force = solve_formfinding(residual_forces, x0, num_steps=10)
 print("\nForce density method")
 x_fdm, residuals_fdm = solve_formfinding(residual_forcedensities, x0, num_steps=10)
 
-forces_fdm = q * compute_vector_lengths(x_fdm - supports)
+edge_vectors_fdm = x_fdm - supports
+lengths_fdm = compute_vectors_norm(edge_vectors_fdm)
+forces_fdm = q * lengths_fdm
 
 # ------------------------------------------------------------------------------
 # Plot
@@ -166,9 +161,43 @@ forces_fdm = q * compute_vector_lengths(x_fdm - supports)
 
 plot_convergence(residuals_force, label="Prescribed forces")
 plot_convergence(residuals_fdm, label="Force density method")
-
-view_funicular_shape(supports, x0, load=load, forces=forces, color="0.7", residual=residual_forces(x0), name="Initial")
-view_funicular_shape(supports, x_force, load=load, forces=forces, color="C1", residual=residual_forces(x_force), name="Prescribed forces")
-view_funicular_shape(supports, x_fdm, load=load, forces=forces_fdm, color="C0", residual=residual_forcedensities(x_fdm), name="Force density method")
-
 show_plots()
+
+# ------------------------------------------------------------------------------
+# Visualize the results
+# ------------------------------------------------------------------------------
+
+view_structure(
+    supports,
+    x0,
+    load=load,
+    forces=forces,
+    color="0.7",
+    edgewidth=0.02,
+    residual=residual_forces(x0),
+    name="Initial",
+    )
+
+view_structure(
+    supports,
+    x_force,
+    load=load,
+    forces=forces,
+    color="C1",
+    edgewidth=0.05,
+    residual=residual_forces(x_force),
+    name="Prescribed forces",
+    )
+
+view_structure(
+    supports,
+    x_fdm,
+    load=load,
+    forces=forces_fdm,
+    color="C0",
+    edgewidth=0.05,
+    residual=residual_forcedensities(x_fdm),
+    name="Force density method",
+    )
+
+show_viewer()

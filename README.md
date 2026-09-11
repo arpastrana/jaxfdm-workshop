@@ -199,6 +199,7 @@ jaxfdm-workshop/
 ├── check.py
 │
 ├── data/
+│   └── mesh_27.json
 │
 ├── 00_jax/
 │   └── jax_crash_course.ipynb
@@ -207,7 +208,8 @@ jaxfdm-workshop/
 ├── 02_arch/
 │   └── arch.py
 ├── 03_gridshell/
-│   └── constrained_formfinding.py
+│   ├── gridshell.py
+│   └── planarity.py
 ├── 04_challenge/
 │   └── design_challenge.py
 │

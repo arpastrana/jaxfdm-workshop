@@ -1,5 +1,7 @@
+# Local files
 presentation/
 *.DS_Store
+_archive/
 
 # Python
 __pycache__/
