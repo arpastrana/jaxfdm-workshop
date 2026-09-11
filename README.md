@@ -1,20 +1,26 @@
 # Introduction to Differentiable Form-Finding with JAX FDM
 
-Workshop at IASS 2026 in Turin, Italy.
+Workshop at IASS 2026.
 
-**September 13th, 2026 — Room 8i, Politecnico di Torino**
+**Sunday, September 13th, 2026 / 13:00 - 18:00**
 
-Form-finding computes the shape a structure takes in static equilibrium. Making that
-computation **differentiable** turns it into a design tool: instead of only asking
-"what shape do these forces give me?", we can ask "what forces give me the shape I
-want?" and let gradients answer.
+![Form-found gridshell](gridshell.png)
 
-This workshop builds that idea from scratch, then puts it to work with
-[JAX FDM](https://github.com/arpastrana/jax_fdm).
+## Motivation
+
+Form-finding computes funicular geometry for a structure: a shape that endows it with the ability to bear external loads predominantly through internal axial forces.
+This load-bearing behavior allows a structure to be mechanically efficient relative to a system whose geometry is not form-found, thus leading to material economy.
+
+While approaches like the force density method (FDM) have greatly simplified the tractable computation of funicular geometry in a forward way, these approaches offer limited support to design for target shapes that comply with fabrication and other technical constraints besides mechanical efficiency.
+The reason is that this map from design requisites to shape descriptors poses an _inverse problem_.
+
+Powered by recent advances in the machine learning tool stack, turning form-finding methods into **differentiable** computer programs opens up new pathways for lightweight structural designs by letting the **gradient**, a mathematical object encoding the direction of steepest ascent of a function, guide the search automatically toward constrained funicular geometry.
+
+This workshop explores this idea by utilizing [JAX FDM](https://github.com/arpastrana/jax_fdm) in Python 🐍.
 
 ## Objectives
 
-By the end of the workshop you will be able to:
+By the end of the workshop you should be able to:
 
 1. **Explain how the force density method, automatic differentiation, and
    gradient-based optimization work** — and why combining them makes form-finding
@@ -26,27 +32,90 @@ By the end of the workshop you will be able to:
 ## Prerequisites
 
 - Comfort reading and editing Python. No JAX experience required.
-- Basic structural intuition (equilibrium, tension and compression).
-- **A laptop.** Everyone works locally, on their own machine, on the **CPU**. There
-  is no GPU requirement. Windows ARM64 machines cannot install JAX at all; a cloud
-  fallback is available for them through the instructor.
-- **[Cursor](https://cursor.com)** installed. We use it as the agentic coding
-  assistant throughout, and objective 2 depends on it.
-
-Please complete the installation below **before the workshop**, not on the day.
+- Basic structural intuition (equilibrium, axial tension and compression).
 
 ## Installation
 
-Four things to install and one command to verify: **Cursor**, **git**, **uv**, then
-the environment itself. Pick your operating system below.
+Pick your operating system and follow only that section. Install **Cursor** first,
+open a terminal **inside Cursor**, then type every remaining command there.
+
+### Windows
+
+**1. Install Cursor**
+
+Download the Windows installer from [cursor.com](https://cursor.com) and run it.
+Open Cursor from the Start menu.
+
+**2. Open a terminal in Cursor**
+
+Choose **View → Terminal**, or **Terminal → New Terminal**, or press **Ctrl+`**
+(Control and the backtick key, above Tab).
+
+The tab should say `powershell`. If it says `cmd` or `Command Prompt`, click the
+small arrow next to the `+` on the terminal panel and choose **PowerShell**. The
+commands below will not work in Command Prompt.
+
+**3. Install git**
+
+```powershell
+git --version
+winget install --id Git.Git -e
+```
+
+Run the `winget` line only if `git --version` reports that git is not recognized.
+Close the terminal panel and open a new one afterwards.
+
+**4. Install uv**
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+Close the terminal panel and open a new one so `uv` lands on your `PATH`, then
+confirm:
+
+```powershell
+uv --version
+```
+
+**5. Get the repository**
+
+```powershell
+git clone https://github.com/arpastrana/jaxfdm-workshop.git
+cd jaxfdm-workshop
+```
+
+Then in Cursor choose **File → Open Folder…** and select the `jaxfdm-workshop`
+folder you just cloned. Open a terminal again in that window (it should still
+say `powershell`).
+
+**6. Create the environment**
+
+```powershell
+uv sync
+```
+
+**7. Check your setup**
+
+```powershell
+uv run python check.py
+```
 
 ### macOS
 
 **1. Install Cursor**
 
 Download it from [cursor.com](https://cursor.com) and drag it into `/Applications`.
+Open Cursor from Applications.
 
-**2. Install git**
+**2. Open a terminal in Cursor**
+
+Choose **View → Terminal**, or **Terminal → New Terminal**, or press **Ctrl+`**
+(Control and the backtick key, above Tab).
+
+The tab will say `zsh` or `bash`. Either is fine.
+
+**3. Install git**
 
 macOS ships git with the Xcode Command Line Tools. Check and install if needed:
 
@@ -55,91 +124,45 @@ git --version
 xcode-select --install
 ```
 
-**3. Install uv**
+**4. Install uv**
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-Close and reopen your terminal so `uv` lands on your `PATH`, then confirm:
+Close the terminal panel and open a new one (**Terminal → New Terminal**) so `uv`
+lands on your `PATH`, then confirm:
 
 ```bash
 uv --version
 ```
 
-**4. Get the repository**
+**5. Get the repository**
 
 ```bash
 git clone https://github.com/arpastrana/jaxfdm-workshop.git
 cd jaxfdm-workshop
 ```
 
-**5. Create the environment**
+Then in Cursor choose **File → Open Folder…** and select the `jaxfdm-workshop`
+folder you just cloned. Open a terminal again in that window.
+
+**6. Create the environment**
 
 ```bash
 uv sync
 ```
 
-**6. Check your setup**
+**7. Check your setup**
 
 ```bash
-uv run python check.py
-```
-
-### Windows
-
-Use **PowerShell** for all of the commands below. Open it from the Start menu by
-typing "PowerShell".
-
-**1. Install Cursor**
-
-Download the Windows installer from [cursor.com](https://cursor.com) and run it.
-
-**2. Install git**
-
-```powershell
-git --version
-winget install --id Git.Git -e
-```
-
-Run the `winget` line only if `git --version` reports that git is not recognized.
-Close and reopen PowerShell afterwards.
-
-**3. Install uv**
-
-```powershell
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-```
-
-Close and reopen PowerShell so `uv` lands on your `PATH`, then confirm:
-
-```powershell
-uv --version
-```
-
-**4. Get the repository**
-
-```powershell
-git clone https://github.com/arpastrana/jaxfdm-workshop.git
-cd jaxfdm-workshop
-```
-
-**5. Create the environment**
-
-```powershell
-uv sync
-```
-
-**6. Check your setup**
-
-```powershell
 uv run python check.py
 ```
 
 ### What those last two commands do
 
 `uv sync` installs the exact versions recorded in `uv.lock` — Python 3.12, JAX, and
-JAX FDM 0.14.0 among them. You do **not** need to install Python yourself: this
+JAX FDM 0.14.1 among them. You do **not** need to install Python yourself: this
 repository pins Python 3.12 in `.python-version` and uv downloads it for you. Use
 `uv sync --locked` if you want uv to fail rather than silently re-resolve when the
 lockfile is out of date.
@@ -160,7 +183,7 @@ If anything fails, send a screenshot of the whole report to the instructor.
 ### Run an example
 
 ```bash
-uv run python examples/twobar.py
+uv run python 01_form_finding/four_bars.py
 ```
 
 Prefix every Python command with `uv run` — that is what puts the workshop
@@ -170,76 +193,23 @@ environment on the path.
 
 | Machine | Status |
 | --- | --- |
-| Apple Silicon Mac (M1 and later) | Supported |
 | Windows, x64 | Supported |
-| Linux, x86_64 or arm64 | Supported |
+| Apple Silicon Mac (M1 and later) | Supported |
 | **Windows on ARM** | **Not supported — contact the instructor** |
 | **Intel Mac** | **Not supported — contact the instructor** |
 
-JAX publishes no wheels for Windows on ARM, and stopped publishing macOS x86_64
-wheels after jaxlib 0.4.38, so `uv sync` cannot succeed on either machine.
 
-If you are on one of them, please contact the instructor well before September 13th.
-Windows ARM64 machines can be set up with a cloud fallback; Intel Macs need a
-different machine. Either way, get in touch ahead of time rather than on the day —
-`check.py` will tell you the same thing if you run it first.
-
-## Repository structure
-
-```bash
-jaxfdm-workshop/
-│
-├── README.md
-├── AGENTS.md
-├── CLAUDE.md
-├── pyproject.toml
-├── uv.lock
-├── .python-version
-├── .gitignore
-├── check.py
-│
-├── data/
-│   └── mesh_27.json
-│
-├── 00_jax/
-│   └── jax_crash_course.ipynb
-├── 01_equilibrium/
-│   └── fdm_from_scratch.py
-├── 02_arch/
-│   └── arch.py
-├── 03_gridshell/
-│   ├── gridshell.py
-│   └── planarity.py
-├── 04_challenge/
-│   └── design_challenge.py
-│
-└── examples/
-    ├── twobar.py
-    ├── fourbar.py
-    ├── arch_formfinding_newton_vs_fdm.py
-    ├── truss_fourbar.py
-    └── visualization.py
-```
-
-Exercise folders are added as the material is finalized, so a fresh clone may not
-have all of them yet. The `examples/` folder holds worked examples you can read and
-run at any point.
+**If your machine is not supported, please contact the instructor before the workshop begins to find a workaround.**
 
 ## Workshop outline
 
-1. **`00_jax` — a JAX crash course.** Arrays, `jit`, `grad`, and the functional style
-   JAX expects.
-2. **`01_equilibrium` — equilibrium from scratch.** Derive the force density method
-   by hand, and see why prescribing force densities instead of forces turns a
-   nonlinear problem into a linear one.
-3. **`02_arch` — the arch.** Form-finding a real structure, and differentiating
-   through the solve.
-4. **`03_gridshell` — constrained form-finding.** Goals, losses, and constraints on a
-   gridshell with JAX FDM's optimization API.
-5. **`04_challenge` — a design challenge.** An open-ended task, tackled with an
-   agentic assistant.
+1. **`00_jax` — a JAX crash course.** Arrays, `jit`, `grad`, and the functional style JAX expects.
+2. **`01_form_finding` — equilibrium from scratch.** Derive the force density method, and see why prescribing force densities instead of forces turns a nonlinear problem into a linear one.
+3. **`02_arches` — the arches.** Form-finding a real structure, and differentiating through the linear equilibrium solve.
+4. **`03_gridshell` — constrained form-finding.** Goals, losses, and constraints on a gridshell with JAX FDM's optimization API.
+5. **`04_cablenet` — a tensile cable-net.** Same method, opposite sign of `q`. Then goals on forces and lengths rather than on geometry.
 
-## Working with an AI assistant
+## Working with an AI coding assistant
 
 `AGENTS.md` holds the house rules for coding assistants in this repository — use the
 public JAX FDM API, keep changes small and pedagogically transparent, don't solve
@@ -249,7 +219,7 @@ automatically.
 
 ## Resources
 
-- [JAX FDM](https://github.com/arpastrana/jax_fdm) — repository and documentation
+- [Differentiable FDM](https://doi.org/10.1016/j.cma.2026.118783) — scientific article explaining the theory behind JAX FDM
+- [JAX FDM](https://arpastrana.github.io/jax_fdm/) — documentation, how-to guides, and examples
 - [JAX](https://docs.jax.dev/) — official documentation
-- [uv](https://docs.astral.sh/uv/) — official documentation
 - [Cursor](https://docs.cursor.com/) — official documentation

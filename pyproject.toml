@@ -6,7 +6,7 @@ requires-python = ">=3.12,<3.13"
 
 dependencies = [
     "jax[cpu]>=0.6.1",
-    "jax-fdm[viz]==0.14.0",
+    "jax-fdm[viz]==0.14.1",
     "matplotlib",
     "jupyterlab",
     "ipykernel"

@@ -575,7 +575,7 @@ wheels = [
 
 [[package]]
 name = "jax-fdm"
-version = "0.14.0"
+version = "0.14.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "compas" },
@@ -589,9 +589,9 @@ dependencies = [
     { name = "optimistix" },
     { name = "scipy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/8b/db/4175413766064f205410a865af6b8bc6051ea49a502fea7c740375afeb7d/jax_fdm-0.14.0.tar.gz", hash = "sha256:85862237369dbde8ff860d233e50846735520566a4820826a3b1df140bdda1f9", size = 194066, upload-time = "2026-07-25T01:04:05.049Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/55/a2/1c70121a88ea1ccd80656c6826f451b92f87ba0b30a063006b8872565d8d/jax_fdm-0.14.1.tar.gz", hash = "sha256:47a705c8bd792b77ec20dd129943080a908f7bf34a42c86d05a09406d1fc7304", size = 192699, upload-time = "2026-09-11T06:20:29.449Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/89/5f/eb070bf413444f7ee27a07fa287d60e72422e9533496c1e6d4be5d55cbb5/jax_fdm-0.14.0-py3-none-any.whl", hash = "sha256:ba666d3ac7a40bf1e6e0b4cb0d7bfd610c3a74e9e4e34febb643f008201bd032", size = 192793, upload-time = "2026-07-25T01:04:03.925Z" },
+    { url = "https://files.pythonhosted.org/packages/a9/64/e833d027fc4ca997a6b0235958d6a4761b582bbf21acfa3bb3d7cb6fd2b8/jax_fdm-0.14.1-py3-none-any.whl", hash = "sha256:959eb94ea0deb92c3c99d4e9ca8af60b1fa281e8d456d9501c035e49326915da", size = 190179, upload-time = "2026-09-11T06:20:28.136Z" },
 ]
 
 [package.optional-dependencies]
@@ -618,7 +618,7 @@ dependencies = [
 requires-dist = [
     { name = "ipykernel" },
     { name = "jax", extras = ["cpu"], specifier = ">=0.6.1" },
-    { name = "jax-fdm", extras = ["viz"], specifier = "==0.14.0" },
+    { name = "jax-fdm", extras = ["viz"], specifier = "==0.14.1" },
     { name = "jupyterlab" },
     { name = "matplotlib" },
 ]
