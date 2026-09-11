@@ -1,17 +1,15 @@
 """
 Exercise 3: match a target shape with a compression-only gridshell.
 
-A flat quad grid is form-found until its vertices land on a target surface.
+The target mesh is the starting structure. Form-finding then looks for a
+compression shape that stays close to it.
 Three goals compete: one pulls the vertices onto the target, one flattens the
 quad panels so they could be built from flat glass, and one keeps the mesh even
 and free of creases. The supports may also slide up and down to help the panels
 lie flat.
 """
 
-from math import sqrt
 from pathlib import Path
-
-from compas.geometry import Translation
 
 from jax_fdm.datastructures import FDMesh
 from jax_fdm.equilibrium import constrained_fdm
@@ -78,17 +76,10 @@ mesh_target = FDMesh.from_json(FILE_TARGET)
 print(mesh_target)
 
 # ------------------------------------------------------------------------------
-# Build a flat grid to start from
+# Starting mesh: same connectivity and vertex numbering as the target
 # ------------------------------------------------------------------------------
 
-# The grid has the same vertex order as the target, so vertex i pairs with vertex i
-bounding_box = mesh_target.aabb()
-num_faces_side = int(sqrt(mesh_target.number_of_faces()))
-
-mesh = FDMesh.from_meshgrid(bounding_box.xsize, num_faces_side, dy=bounding_box.ysize)
-
-shift_vector = [-bounding_box.xsize / 2.0, -bounding_box.ysize / 2.0, 0.0]
-mesh.transform(Translation.from_vector(shift_vector))
+mesh = mesh_target.copy()
 
 # ------------------------------------------------------------------------------
 # Define the structural system
@@ -105,10 +96,10 @@ for vertex in mesh.vertices_on_boundary():
     xyz = mesh_target.vertex_coordinates(vertex)
     mesh.vertex_attributes(vertex, "xyz", xyz)
 
-# Self-weight lumped at each vertex, using the area it carries on the target
+# Self-weight lumped at each vertex via tributary area
 for vertex in mesh.vertices():
-    area = mesh_target.vertex_area(vertex)
-    load = [0.0, 0.0, area * load_area]
+    tributary_area = mesh_target.vertex_area(vertex)
+    load = [0.0, 0.0, tributary_area * load_area]
     mesh.vertex_load(vertex, load)
 
 # ------------------------------------------------------------------------------
@@ -146,11 +137,7 @@ error_smoothness = MeanPredictionError(goals_smoothness, alpha=weight_smoothness
 # Assemble goals in the loss function
 # ------------------------------------------------------------------------------
 
-loss = Loss(
-    error_shape,
-    error_planarity,
-    error_smoothness,
-)
+loss = Loss(error_shape, error_planarity, error_smoothness)
 
 # ------------------------------------------------------------------------------
 # You give and you take: Parameters
@@ -162,15 +149,11 @@ for edge in mesh.edges():
     parameters.append(parameter)
 
 # Support finding: let the rim slide up and down, but not sideways
-# A tolerance of zero would pin the supports with zero-width bounds, so skip them
+# Active if the z tolerance is greater than zero
 if support_z_tolerance > 0.0:
     for vertex in mesh.vertices_supports():
         z = mesh.vertex_attribute(vertex, "z")
-        parameter = VertexSupportZParameter(
-            vertex,
-            z - support_z_tolerance,
-            z + support_z_tolerance,
-        )
+        parameter = VertexSupportZParameter(vertex, z - support_z_tolerance, z + support_z_tolerance)
         parameters.append(parameter)
 
 # ------------------------------------------------------------------------------
@@ -193,7 +176,6 @@ opt_mesh.print_stats()
 # ------------------------------------------------------------------------------
 # Solution statistics
 # ------------------------------------------------------------------------------
-
 
 distance_mean, distance_max = distance_to_target(opt_mesh, mesh_target)
 
