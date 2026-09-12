@@ -161,11 +161,12 @@ uv run python check.py
 
 ### What those last two commands do
 
-`uv sync` installs the exact versions recorded in `uv.lock` — Python 3.12, JAX, and
+`uv sync` installs the exact versions recorded in `uv.lock` — Python 3.13, JAX, and
 JAX FDM 0.14.1 among them. You do **not** need to install Python yourself: this
-repository pins Python 3.12 in `.python-version` and uv downloads it for you. Use
+repository pins Python 3.13 in `.python-version` and uv downloads it for you. Use
 `uv sync --locked` if you want uv to fail rather than silently re-resolve when the
-lockfile is out of date.
+lockfile is out of date. The project also accepts Python 3.12, which some Google
+Colab runtimes still ship.
 
 `check.py` reports your OS and architecture, verifies every required package imports,
 confirms your Python and JAX FDM versions match the pins, and runs small JIT,
@@ -199,7 +200,21 @@ environment on the path.
 | **Intel Mac** | **Not supported — contact the instructor** |
 
 
-**If your machine is not supported, please contact the instructor before the workshop begins to find a workaround.**
+**If your machine is not supported, use the Google Colab fallback below, or contact the instructor before the workshop begins.**
+
+### Google Colab
+
+A browser fallback for unsupported machines, or if the local install fails.
+
+1. Open [`colab.ipynb`](https://colab.research.google.com/github/arpastrana/jaxfdm-workshop/blob/main/colab.ipynb) in Colab.
+2. Choose **Runtime → Run all**. The cells install JAX FDM, clone this repository, point `Viewer` at the notebook backend, then run the four-bar and gridshell examples.
+3. Use `%run` for any later `.py` example, not `!python`, so the notebook 3D viewer can display.
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/arpastrana/jaxfdm-workshop/blob/main/colab.ipynb)
+
+The JAX primer can also be opened on its own:
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/arpastrana/jaxfdm-workshop/blob/main/00_jax/jax_primer.ipynb)
 
 ## Workshop outline
 
