@@ -11,6 +11,8 @@ lie flat.
 
 from pathlib import Path
 
+from compas.datastructures import Mesh
+
 from jax_fdm.datastructures import FDMesh
 from jax_fdm.equilibrium import constrained_fdm
 from jax_fdm.goals import MeshPlanarityGoal
@@ -72,14 +74,14 @@ FILE_TARGET = ROOT_DIR / "data" / "mesh_freeform.json"
 # Load the target shape
 # ------------------------------------------------------------------------------
 
-mesh_target = FDMesh.from_json(FILE_TARGET)
+mesh_target = Mesh.from_json(FILE_TARGET)
 print(mesh_target)
 
 # ------------------------------------------------------------------------------
 # Starting mesh: same connectivity and vertex numbering as the target
 # ------------------------------------------------------------------------------
 
-mesh = mesh_target.copy()
+mesh = mesh_target.copy(FDMesh)
 
 # ------------------------------------------------------------------------------
 # Define the structural system
