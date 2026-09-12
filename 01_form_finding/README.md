@@ -85,10 +85,14 @@ That is not a bug to fix, it is the trade the method makes.
 
 1. Run `four_bars.py` and read the two traces. How many updates does each need?
 2. Make the load ten times larger. The force density method still lands in one
-   step. Prescribed forces runs away to `1e52`. Four bars carrying about 1 kN
-   each cannot hold up 10 kN, so no equilibrium exists and Newton has nothing to
-   converge to. Force densities always have a solution, because the force in a
-   bar grows as the bar stretches.
+   step. Prescribed forces runs away instead: the node passes `1e52` by step 6
+   and `1e103` by step 9, while the residual never drops, just bounces between
+   6.5 and 13.5. Four bars carrying about 1 kN each cannot hold up 10 kN, so no
+   equilibrium exists and Newton has nothing to converge to. Note that the
+   residual stays bounded even as the node flies off, because each bar
+   contributes a unit direction times a fixed force. Watch `x`, not just `|r|`.
+   Force densities always have a solution, because the force in a bar grows as
+   the bar stretches.
 3. Move the starting point `x0` to `[3.0, 3.0, 3.0]`. The force density method
    still takes one step, but it lands somewhere else entirely. Look at where `q`
    comes from and explain why. One step is guaranteed; the answer is not.
@@ -97,7 +101,9 @@ That is not a bug to fix, it is the trade the method makes.
    shape make sense?
 5. In `solve_formfinding`, replace the Jacobian with the identity,
    `K = jnp.eye(3)`. That turns Newton into plain gradient descent with a step
-   of one, and it diverges immediately. What was the Jacobian doing for you?
+   of one, and it stops converging: the residual climbs from 1.96 to about 4.49
+   and stalls there while the node drifts steadily away. What was the Jacobian
+   doing for you?
 
 ## The same problem in one call
 

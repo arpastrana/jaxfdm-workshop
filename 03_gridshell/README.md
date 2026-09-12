@@ -16,16 +16,36 @@ The viewer shows the target as a plain translucent shape, with the form-found
 gridshell inside it: nodes, edges, load arrows, and every panel painted by how
 far it is from flat.
 
+## Where the target comes from
+
+`data/mesh_freeform.json` is a doubly curved quad mesh modeled in Rhino 8 and
+exported with `rhino_mesh_exporter.ghx`: 100 vertices, 81 quad faces, spanning
+about 11 × 11 m and rising 5.5 m.
+
+It arrives as a plain COMPAS `Mesh`, not an `FDMesh`. Rhino 8 runs on Python 3.9,
+which cannot host JAX, so the file carries geometry only and the structural side is
+added on this end:
+
+```python
+mesh_target = Mesh.from_json(FILE_TARGET)
+mesh = mesh_target.copy(FDMesh)
+```
+
+`copy(FDMesh)` keeps the vertex numbering and the face winding, and picks up the
+force density attributes that `FDMesh` defines and a plain mesh does not.
+
 ## What the script says
 
-The target is `data/mesh_freeform.json`: 100 vertices, 81 quad faces, spanning about
-11 × 11 m and rising 5.5 m. The starting grid is generated flat, in the same
-vertex order, so vertex *i* pairs with vertex *i* on the target.
+The starting mesh is that copy, so it *begins* on the target: vertex *i* pairs with
+vertex *i* by construction, and the distance to the target starts at zero.
 
-The grid comes out of `from_meshgrid` with a square rim lying on the ground, but
-the target's rim is curved and 16 of its 36 boundary vertices are well above it.
-The script snaps the supports onto the target rim by construction, rather than
-asking the optimizer to chase a rim it could never reach.
+Equilibrium is what pulls it off. The shell has to hang under its own weight in
+compression, and its panels have to be flat, and neither is true of the surface you
+modeled. What the optimizer looks for is the force densities whose equilibrium shape
+stays as close to the target as those other demands allow.
+
+All 36 boundary vertices are supports, 16 of them well above the ground, so the rim
+stays on the target curve and only the interior is free to move.
 
 Three goals go into the loss:
 
