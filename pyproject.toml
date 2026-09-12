@@ -2,7 +2,7 @@
 name = "jax-fdm-workshop"
 version = "0.1.0"
 description = "Workshop materials for differentiable form-finding with JAX FDM"
-requires-python = ">=3.12,<3.13"
+requires-python = ">=3.12,<3.14"
 
 dependencies = [
     "jax[cpu]>=0.6.1",
