@@ -34,7 +34,7 @@ target_rise = 3.0
 
 # TUNE THIS NUMBER
 # Negative force densities put the arches in compression, positive in tension
-q = -2.5
+q = -3.75
 
 # ------------------------------------------------------------------------------
 # Two arches crossing at the crown

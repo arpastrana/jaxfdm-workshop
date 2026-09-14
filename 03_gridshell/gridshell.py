@@ -48,16 +48,16 @@ q_bound_up = -1e-3
 
 # TUNE THESE NUMBERS
 # How much flat panels matter compared to hitting the target shape
-weight_planarity = 100.0
+weight_planarity = 100.0  # 100.0
 
 # How much an even, crease-free mesh matters
-weight_smoothness = 0.5
+weight_smoothness = 0.5  # 0.5
 
 # How far the supports may slide up or down to help the panels lie flat
-support_z_tolerance = 0.5
+support_z_tolerance = 0.0  # 0.5
 
 # A panel is buildable from flat glass if it warps less than this fraction of its size
-max_deviation = 0.01  # 1%
+max_deviation = 0.02  # 1%
 
 # Optimizer budget
 max_iterations = 1000

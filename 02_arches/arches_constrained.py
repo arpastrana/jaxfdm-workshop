@@ -115,12 +115,13 @@ loss = Loss(SquaredError(goals))
 
 # Every edge gets its own force density, so the problem has twenty unknowns
 # For one force density shared by every edge, swap the loop below for these lines
-# from jax_fdm.parameters import EdgeGroupForceDensityParameter
-# parameters = [EdgeGroupForceDensityParameter(list(network.edges()))]
-parameters = []
-for edge in network.edges():
-    parameter = EdgeForceDensityParameter(edge)
-    parameters.append(parameter)
+from jax_fdm.parameters import EdgeGroupForceDensityParameter
+parameters = [EdgeGroupForceDensityParameter(list(network.edges()))]
+
+# parameters = []
+# for edge in network.edges():
+#     parameter = EdgeForceDensityParameter(edge)
+#     parameters.append(parameter)
 
 # ------------------------------------------------------------------------------
 # Solve the inverse problem
