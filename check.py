@@ -9,6 +9,7 @@ Run with:
 from __future__ import annotations
 
 import importlib
+import os
 import platform
 import struct
 import sys
@@ -243,18 +244,29 @@ def jaxfdm_pinned() -> str | None:
     return None
 
 
+# Local uv pin is 3.13; Colab may still be 3.12
+SUPPORTED_PYTHON = ("3.12", "3.13")
+IN_COLAB = "google.colab" in sys.modules or "COLAB_RELEASE_TAG" in os.environ
+
 python_expected = python_pinned()
+python_found = version_series(python_version)
 
 if python_expected is None:
     skipped("Pinned Python", ".python-version not found")
 
-elif version_series(python_version) == version_series(python_expected):
+elif python_found == version_series(python_expected):
     passed("Pinned Python", f"{python_version} matches {python_expected}")
+
+elif python_found in SUPPORTED_PYTHON:
+    passed(
+        "Supported Python",
+        f"{python_version} is supported (local pin is {python_expected})",
+    )
 
 else:
     failed(
         "Pinned Python",
-        f"expected {python_expected}, found {python_version}",
+        f"expected {python_expected} or 3.12, found {python_version}",
     )
 
 
@@ -445,8 +457,11 @@ if not failures:
     print()
     print(f"  {CHECK}  Everything looks good!")
     print()
-    print("     Your computer is ready for the JAX FDM workshop.")
-    print("     uv, JAX and JAX FDM all run locally.")
+    if IN_COLAB:
+        print("     This Colab runtime is ready for the JAX FDM workshop.")
+    else:
+        print("     Your computer is ready for the JAX FDM workshop.")
+        print("     uv, JAX and JAX FDM all run locally.")
 
     if warnings:
         print()
