@@ -196,11 +196,11 @@ environment on the path.
 | --- | --- |
 | Windows, x64 | Supported |
 | Apple Silicon Mac (M1 and later) | Supported |
-| **Windows on ARM** | **Not supported — contact the instructor** |
-| **Intel Mac** | **Not supported — contact the instructor** |
+| **Windows on ARM** | **Not supported — contact the instructor, and use [Google Colab](#google-colab)** |
+| **Intel Mac** | **Not supported — contact the instructor, and use [Google Colab](#google-colab)** |
 
 
-**If your machine is not supported, use the Google Colab fallback below, or contact the instructor before the workshop begins.**
+**If your machine is not supported, contact the instructor before the workshop begins, and use the Google Colab fallback below to follow along.**
 
 ### Google Colab
 
